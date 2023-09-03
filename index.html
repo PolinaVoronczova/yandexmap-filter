@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="https://api-maps.yandex.ru/v3/?apikey=9d679cb2-6f63-4bb3-a9d0-55e0aca74963&lang=ru_RU"></script>
+	<style>
+        #map {
+            width: 100%; height: 100%; padding: 0; margin: 0;
+        }
+    </style>
+    <!DOCTYPE html>
+
+    <html>
+     -->
+    <head>
+        <title>Фильтрация объектов на карте по различным признакам</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!--
+            Укажите свой API-ключ. Тестовый ключ НЕ БУДЕТ работать на других сайтах.
+            Получить ключ можно в Кабинете разработчика: https://developer.tech.yandex.ru/keys/
+        -->
+        <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=9d679cb2-6f63-4bb3-a9d0-55e0aca74963" type="text/javascript"></script>
+        <script type="text/javascript" src="https://yandex.st/jquery/2.2.3/jquery.js"></script>
+        <style>
+            body, html {
+                font-family: Arial;
+                font-size: 11pt;
+                padding: 0;
+                margin: 0;
+                width: 100%;
+                height: 100%;
+            }
+            #map {
+                width: 100%;
+                height: 60%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <div style="padding: 5px;">
+            <div>
+                <input type='checkbox' id='g' checked=true>Горнолыжка</input><br>
+                <input type='checkbox' id='b' checked=true>Баня</input><br>
+                <input type='checkbox' id='k' checked=true>Каток</input>
+            </div>
+        </div>
+        <script>
+          ymaps.ready(init);
+
+function init() {
+    var myMap = new ymaps.Map('map', {
+            center: [53.813827, 58.636636],
+            zoom: 15
+        }, {
+            searchControlProvider: 'yandex#search'
+        });
+        MyIconContentLayout = ymaps.templateLayoutFactory.createClass(
+            '<div style="color: #FFFFFF; font-weight: bold;">$[properties.iconContent]</div>'
+        ),
+        myPlacemarkTan = new ymaps.Placemark([53.813827, 58.636636], {
+            hintContent: 'Танхаус',
+            balloonContent: 'Что-то'
+        }, {
+            // Опции.
+            // Необходимо указать данный тип макета.
+            iconLayout: 'default#image',
+            // Своё изображение иконки метки.
+            iconImageHref: 'https://abzakovo.hwdedic.ru/wp-content/uploads/2023/09/icon_geo-position.svg',
+            // Размеры метки.
+            iconImageSize: [30, 42],
+            // Смещение левого верхнего угла иконки относительно
+            // её "ножки" (точки привязки).
+            iconImageOffset: [-5, -38]
+        }),
+        myPlacemarkKat = new ymaps.Placemark([53.814088, 58.634518], {
+            hintContent: 'Коттеджи',
+            balloonContent: 'Что-то'
+        }, {
+            // Опции.
+            // Необходимо указать данный тип макета.
+            iconLayout: 'default#image',
+            // Своё изображение иконки метки.
+            iconImageHref: 'https://abzakovo.hwdedic.ru/wp-content/uploads/2023/09/icon_geo-position.svg',
+            // Размеры метки.
+            iconImageSize: [30, 42],
+            // Смещение левого верхнего угла иконки относительно
+            // её "ножки" (точки привязки).
+            iconImageOffset: [-5, -38]
+        });
+        myMap.geoObjects
+        .add(myPlacemarkTan)
+        .add(myPlacemarkKat);
+    
+    // Функция, которая по состоянию чекбоксов в меню
+    // показывает или скрывает геообъекты из выборки.
+    function checkState () {
+        var shownObjects,
+            byType = new ymaps.GeoQueryResult();
+        
+        // Отберем объекты по цвету. 
+        if ($('#g').prop('checked')) {
+            // Будем искать по двум параметрам:
+            // - для точечных объектов по полю preset;
+            // - для контурных объектов по цвету заливки.
+            byType = myObjects.search('options.types = "g"');
+        }
+        if ($('#b').prop('checked')) {
+            byType = myObjects.search('options.types = "b"').add(byType);
+        }
+        if ($('#k').prop('checked')) {
+          byType = myObjects.search('options.types = "k"').add(byType);
+        }
+        // Объекты, которые не попали в выборку, нужно убрать с карты.
+        shownObjects = byType.addToMap(myMap);
+        myObjects.remove(shownObjects).removeFromMap(myMap);
+    }
+    
+    $('#g').click(checkState);
+    $('#b').click(checkState);
+    $('#k').click(checkState);
+    
+    // Создадим объекты из их JSON-описания и добавим их на карту.
+    window.myObjects = ymaps.geoQuery({
+        type: "FeatureCollection",
+        features: [
+            {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [53.814029, 58.636352]
+                },
+                options: {
+                    preset: 'https://abzakovo.hwdedic.ru/wp-content/uploads/2023/09/icon_geo-position.svg',
+                    types: 'g'
+                }
+            },
+            {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [53.814167, 58.635630]
+                },
+                options: {
+                    preset: 'https://abzakovo.hwdedic.ru/wp-content/uploads/2023/09/icon_geo-position.svg',
+                    types: 'b'
+                }
+            },
+            {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [53.814029, 58.637635]
+                },
+                options: {
+                    preset: 'https://abzakovo.hwdedic.ru/wp-content/uploads/2023/09/icon_geo-position.svg',
+                    types: 'k'
+                }
+            }
+            
+        ]
+    }).addToMap(myMap);
+}
+
+        </script>
+    </body>
+    </html>
+    
+    <!-- <script>
+    let map;
+
+  main();
+  async function main() {
+      // Промис `ymaps3.ready` будет зарезолвлен, когда загрузятся все компоненты API
+      await ymaps3.ready;
+     const {
+       YMap,
+       YMapDefaultSchemeLayer,
+       YMapControls,
+       YMapDefaultFeaturesLayer,
+       YMapMarker
+     } = ymaps3;
+
+     // Импорт модулей для элементов управления на карте
+     const {
+       YMapZoomControl,
+       YMapGeolocationControl
+     } = await ymaps3.import('@yandex/ymaps3-controls@0.0.1');
+
+     // Координаты центра карты
+     const CENTER_COORDINATES = [53.813827, 58.636636];
+     // координаты метки на карте
+     const MARKER_COORDINATES_TAN = [53.813827, 58.636636];
+     const MARKER_COORDINATES_KOT = [53.814088, 58.634518];
+
+     // Объект с параметрами центра и зумом карты
+     const LOCATION = {center: CENTER_COORDINATES, zoom: 15};
+      // Создание карты
+ map = new YMap(document.getElementById('map'), {location: LOCATION});
+ map.addChild(scheme = new YMapDefaultSchemeLayer());
+     map.addChild(new YMapDefaultFeaturesLayer());
+
+     // Добавление элементов управления на карту
+     map.addChild(new YMapControls({position: 'right'})
+       .addChild(new YMapZoomControl({}))
+     );
+     map.addChild(new YMapControls({position: 'top right'})
+       .addChild(new YMapGeolocationControl({}))
+     );
+     const kt = document.createElement('img');
+     kt.className = 'kott';
+     kt.src = 'https://abzakovo.hwdedic.ru/wp-content/uploads/2023/09/icon_geo-position.svg';
+     kt.title = 'Коттеджи';
+      // При клике на маркер меняем центр карты на LOCATION с заданным duration
+      kt.onclick = () => map.update({location: {...LOCATION, duration: 400}});
+
+// Создание заголовка маркера
+const markerTitle1 = document.createElement('div');
+markerTitle1.className = 'marker-tan-title';
+markerTitle1.innerHTML = 'Коттеджи';
+
+// Контейнер для элементов маркера
+const imgContainer1 = document.createElement('div');
+imgContainer1.appendChild(kt);
+imgContainer1.appendChild(markerTitle1);
+
+     const tn = document.createElement('img');
+     tn.className = 'tan';
+     tn.src = 'https://abzakovo.hwdedic.ru/wp-content/uploads/2023/09/icon_geo-position.svg';
+     tn.title = 'Танхаус';
+     // При клике на маркер меняем центр карты на LOCATION с заданным duration
+     tn.onclick = () => map.update({location: {...LOCATION, duration: 400}});
+
+     // Создание заголовка маркера
+     const markerTitle = document.createElement('div');
+     markerTitle.className = 'marker-tan-title';
+     markerTitle.innerHTML = 'Танхаус';
+
+     // Контейнер для элементов маркера
+     const imgContainer = document.createElement('div');
+     imgContainer.appendChild(tn);
+     imgContainer.appendChild(markerTitle);
+     
+    map.addChild(new YMapMarker({coordinates: MARKER_COORDINATES_KOT }, imgContainer1));
+    map.addChild(new YMapMarker({coordinates: MARKER_COORDINATES_TAN }, imgContainer));
+  }
+</script>
+    </script>
+    <div id="map" style="width: 100%; height: 400px"></div> -->
+<!-- </body>
+</html> -->
